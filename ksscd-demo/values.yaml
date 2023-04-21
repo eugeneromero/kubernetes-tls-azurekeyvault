@@ -1,0 +1,14 @@
+backend:
+  namespace: tls-backend
+  ip: 10.96.0.255
+  url: company.com
+
+client:
+  namespace: tls-client
+
+keyvault:
+  name: kv
+  tenant_id: 1234-5678
+  credentials:
+    id: 1234-5678
+    secret: replaceme

@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.client.namespace }}
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tls-client
+  namespace: {{ .Values.client.namespace }}
+  labels:
+    app: client
+spec:
+  volumes:
+    - name: certificate
+      csi:
+        driver: secrets-store.csi.k8s.io
+        readOnly: true
+        volumeAttributes:
+          secretProviderClass: company-certificate
+        nodePublishSecretRef:
+          name: keyvault-credentials
+  hostAliases:
+    - ip: {{ .Values.backend.ip }}
+      hostnames:
+        - {{ .Values.backend.url }}
+  containers:
+    - name: client
+      image: mcr.microsoft.com/dotnet/core/aspnet
+      volumeMounts:
+        - name: certificate
+          subPath: company-certificate
+          mountPath: /usr/local/share/ca-certificates/company.com.crt
+      lifecycle:
+        postStart:
+          exec:
+            command: ["/bin/sh", "-c", "update-ca-certificates"]
+      command: ["/bin/bash", "-c"]
+      args:
+        - while true; do
+            curl -sS https://{{ .Values.backend.url }}/;
+            echo -e "\n ------------------------------------------- \n";
+            sleep 5;
+          done
+  restartPolicy: OnFailure

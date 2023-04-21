@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tls-app-config
+  namespace: {{ .Values.backend.namespace }}
+data:
+  index.html: |
+    |     /\#/\          ...        `  _ ,  '   |
+    |    /(o o)\        (O o)      -  (o)o)  -  |
+    | ooO--(_)--Ooo-ooO--(_)--Ooo--ooO'(_)--Ooo |
+
+  server.conf: |
+    server {
+      listen       8443 ssl;
+      server_name  {{ .Values.backend.url }};
+
+      ssl_certificate      bitnami/certs/server.crt;
+      ssl_certificate_key  bitnami/certs/server.key;
+
+      ssl_session_cache    shared:SSL:1m;
+      ssl_session_timeout  5m;
+
+      ssl_ciphers  HIGH:!aNULL:!MD5;
+      ssl_prefer_server_ciphers  on;
+
+      location / {
+        root   html;
+        index  index.html;
+      }
+    }

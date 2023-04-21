@@ -1,0 +1,8 @@
+apiVersion: v2
+name: ksscd-demo
+description: Demo chart for the "Securing your app's communications with Kubernetes, Azure Key Vault, and TLS certificates" talk
+version: 1.0.0
+sources: 
+maintainers:
+  - name: Eugene Romero
+    url: https://damn.engineer

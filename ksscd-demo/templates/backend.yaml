@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.backend.namespace }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tls-service
+  namespace: {{ .Values.backend.namespace }}
+spec:
+  selector:
+    app: tls
+  type: ClusterIP
+  clusterIP: {{ .Values.backend.ip }}
+  ports:
+    - name: http
+      protocol: TCP
+      port: 443
+      targetPort: 8443
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tls-server
+  namespace: {{ .Values.backend.namespace }}
+  labels:
+    app: tls
+spec:
+  volumes:
+    - name: certificates
+      emptyDir: {}
+    - name: config
+      configMap:
+        name: tls-app-config
+    - name: secrets
+      csi:
+        driver: secrets-store.csi.k8s.io
+        readOnly: true
+        volumeAttributes:
+          secretProviderClass: company-secrets
+        nodePublishSecretRef:
+          name: keyvault-credentials
+  initContainers:
+    - name: prepare-certificate
+      image: alpine:latest
+      command: ["/bin/sh", "-c"]
+      args: ["apk add openssl; openssl pkey -in /secrets/server.pem  -out /certs/server.key; chmod 0644 /certs/server.key; openssl x509 -in /secrets/server.pem  -out /certs/server.crt"]
+      volumeMounts:
+        - name: certificates
+          mountPath: "/certs"
+        - name: secrets
+          mountPath: /secrets/server.pem
+          subPath: company-certificate
+  containers:
+    - name: nginx
+      image: bitnami/nginx:latest
+      ports:
+        - containerPort: 8443
+      volumeMounts:
+        - name: config
+          subPath: index.html
+          mountPath: /app/index.html
+        - name: config
+          subPath: server.conf
+          mountPath: /opt/bitnami/nginx/conf/server_blocks/server.conf
+        - name: certificates
+          mountPath: /certs
