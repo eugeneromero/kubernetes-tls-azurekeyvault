@@ -1,7 +1,11 @@
 # Introduction
 Demo setup for the **"Securing your app's communications with Kubernetes, Azure Key Vault, and TLS certificates"** talk.
 
-More information about the workings of the 
+More information about the workings of the Kubernetes Secrets Store CSI Driver on my blog:
+
+https://damn.engineer/2022/01/31/azure-keyvault-to-kubernetes
+
+and
 
 https://damn.engineer/2022/02/07/tls-cert-azure-keyvault-kubernetes
 
@@ -24,7 +28,7 @@ Log into Azure, create certificate and Service Principal:
 docker run --rm -it --env kv="$kv" -v $(pwd):/code mcr.microsoft.com/azure-cli /bin/bash
 ```
 
-*Run the following commands inside the az-cli Docker container you just started.*
+*NOTE: Run the following commands inside the az-cli Docker container you just started.*
 
 Log into Azure:
 ```
@@ -66,7 +70,7 @@ az keyvault set-policy -n "$kv" \
 You may exit out of the Azure CLI container now, but don't close the terminal just yet.
 
 ## Minikube setup
-*Run these commands in your regular terminal.*
+*NOTE: Run these commands in your regular terminal.*
 
 Start a new Minikube cluster:
 ```
