@@ -77,6 +77,13 @@ Start a new Minikube cluster:
 minikube start
 ```
 
+### Non-TLS version:
+Install this Helm chart:
+```
+helm upgrade -i ksscd-demo ./ksscd-demo/ --set tls="false"
+```
+
+### TLS version
 Add KSSCD repo to Helm, and install it in the cluster:
 ```
 helm repo add csi-secrets-store-provider-azure https://azure.github.io/secrets-store-csi-driver-provider-azure/charts
@@ -87,6 +94,7 @@ helm install csi csi-secrets-store-provider-azure/csi-secrets-store-provider-azu
 Install this Helm chart:
 ```
 helm upgrade -i ksscd-demo ./ksscd-demo/ \
+--set tls="true" \
 --set keyvault.name="$kv" \
 --set keyvault.tenant_id=[SERVICE_PRINCIPAL_TENANT] \
 --set keyvault.credentials.id=[SERVICE_PRINCIPAL_APPID] \
@@ -105,7 +113,7 @@ Destroy the `minikube` cluster:
 minikube delete
 ```
 
-Delete the created Resource Group and Service Principal in the Azure Portal or by logging into a new `az cli` terminal:
+Delete the created Resource Group and Service Principal in the Azure Portal, or by logging into a new `az cli` terminal:
 ```
 docker run --rm -it mcr.microsoft.com/azure-cli /bin/bash
 ```

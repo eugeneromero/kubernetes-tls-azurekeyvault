@@ -13,6 +13,7 @@ metadata:
     app: client
 spec:
   volumes:
+  {{ if .Values.tls }}
     - name: certificate
       csi:
         driver: secrets-store.csi.k8s.io
@@ -21,6 +22,7 @@ spec:
           secretProviderClass: company-certificate
         nodePublishSecretRef:
           name: keyvault-credentials
+  {{ end }}
   hostAliases:
     - ip: {{ .Values.backend.ip }}
       hostnames:
@@ -28,6 +30,7 @@ spec:
   containers:
     - name: client
       image: mcr.microsoft.com/dotnet/core/aspnet
+  {{ if .Values.tls }}
       volumeMounts:
         - name: certificate
           subPath: company-certificate
@@ -36,10 +39,13 @@ spec:
         postStart:
           exec:
             command: ["/bin/sh", "-c", "update-ca-certificates"]
+  {{ end }}
       command: ["/bin/bash", "-c"]
       args:
-        - while true; do
-            curl -sS https://{{ .Values.backend.url }}/;
+        - export BACKEND_URL="{{ if .Values.tls }}https{{ else }}http{{ end }}://{{ .Values.backend.url }}/";
+          while true; do
+            echo -e "\n Attempting $BACKEND_URL \n";
+            curl -sS "$BACKEND_URL";
             echo -e "\n ------------------------------------------- \n";
             sleep 5;
           done

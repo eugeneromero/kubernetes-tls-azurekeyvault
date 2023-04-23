@@ -11,6 +11,8 @@ data:
 
   server.conf: |
     server {
+
+    {{ if .Values.tls }}
       listen       8443 ssl;
       server_name  {{ .Values.backend.url }};
 
@@ -22,6 +24,7 @@ data:
 
       ssl_ciphers  HIGH:!aNULL:!MD5;
       ssl_prefer_server_ciphers  on;
+    {{ end }}
 
       location / {
         root   html;

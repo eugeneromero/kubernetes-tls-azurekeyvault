@@ -1,3 +1,5 @@
+tls: false
+
 backend:
   namespace: tls-backend
   ip: 10.96.0.255

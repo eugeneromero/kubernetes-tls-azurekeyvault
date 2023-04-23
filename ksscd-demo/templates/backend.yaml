@@ -17,8 +17,8 @@ spec:
   ports:
     - name: http
       protocol: TCP
-      port: 443
-      targetPort: 8443
+      port: {{ if .Values.tls }}443{{ else }}80{{ end }}
+      targetPort: {{ if .Values.tls }}8443{{ else }}8080{{ end }}
 
 ---
 apiVersion: v1
@@ -30,11 +30,14 @@ metadata:
     app: tls
 spec:
   volumes:
+  {{ if .Values.tls }}
     - name: certificates
       emptyDir: {}
+  {{ end }}
     - name: config
       configMap:
         name: tls-app-config
+  {{ if .Values.tls }}
     - name: secrets
       csi:
         driver: secrets-store.csi.k8s.io
@@ -43,6 +46,8 @@ spec:
           secretProviderClass: company-secrets
         nodePublishSecretRef:
           name: keyvault-credentials
+  {{ end }}
+{{ if .Values.tls }}
   initContainers:
     - name: prepare-certificate
       image: alpine:latest
@@ -54,11 +59,12 @@ spec:
         - name: secrets
           mountPath: /secrets/server.pem
           subPath: company-certificate
+{{ end }}
   containers:
     - name: nginx
       image: bitnami/nginx:latest
       ports:
-        - containerPort: 8443
+        - containerPort: {{ if .Values.tls }}8443{{ else }}8080{{ end }}
       volumeMounts:
         - name: config
           subPath: index.html
@@ -66,5 +72,7 @@ spec:
         - name: config
           subPath: server.conf
           mountPath: /opt/bitnami/nginx/conf/server_blocks/server.conf
+      {{ if .Values.tls }}
         - name: certificates
           mountPath: /certs
+      {{ end }}
