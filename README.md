@@ -96,9 +96,9 @@ Install this Helm chart:
 helm upgrade -i ksscd-demo ./ksscd-demo/ \
 --set tls="true" \
 --set keyvault.name="$kv" \
---set keyvault.tenant_id=[SERVICE_PRINCIPAL_TENANT] \
---set keyvault.credentials.id=[SERVICE_PRINCIPAL_APPID] \
---set keyvault.credentials.secret=[SERVICE_PRINCIPAL_PASSWORD]
+--set keyvault.tenant_id="[SERVICE_PRINCIPAL_TENANT]" \
+--set keyvault.credentials.id="[SERVICE_PRINCIPAL_APPID]" \
+--set keyvault.credentials.secret="[SERVICE_PRINCIPAL_PASSWORD]"
 ```
 
 # Verifying
