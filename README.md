@@ -77,6 +77,12 @@ Start a new Minikube cluster:
 minikube start
 ```
 
+### Verifying what the chart will do
+You can run the following command (passing any desired `--set` flags) to see what exactly Helm will deploy:
+```
+helm template --set tls=true ksscd-demo/
+```
+
 ### Non-TLS version:
 Install this Helm chart:
 ```
